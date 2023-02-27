@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AppName</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css">
+
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body>
+    <header>
+        <div class="header-list">
+        <%= link_to image_tag("Linkesheadr.logo.png",size:"130x35", class:"header-logo"), root_path, {class: "logo-link"} %>
+          <nav>
+            <ul>
+              <li><%= link_to "投稿一覧", posts_path %></li>
+              <% if user_signed_in? %>
+                <li><%= button_to 'ログアウト', destroy_user_session_path, method: :delete %></li>
+                <li><%= link_to "マイページ", "/users/#{current_user.id}" %></li>
+                <li><%= link_to "新規投稿ページへ", "/posts/new" %><li>
+
+              <% else %>
+                <li><%= link_to "新規登録", new_user_registration_path %></li>
+                <li><%= link_to "ログイン", new_user_session_path %></li>
+              <% end %>
+                <%= form_tag({controller:"posts",action:"index"}, method: :get) do %>
+                    <%= text_field_tag :search %>
+                    <%= submit_tag '🔍'  %>
+                <% end %>
+            </ul>
+          </nav>
+        </div>
+    </header>
+    <main>
+      <%= yield %>
+    </main>
+    <footer>
+      <small>@Linkes 2022</small>
+    </footer>
+  </body>
+</html>

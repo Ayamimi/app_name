@@ -1,0 +1,9 @@
+<div class= "postsearch">
+#<%= @tag.name %>
+<% @posts.each do |t| %>
+    <div class="post">
+        <%= t.body %>
+    </div>
+<% end %>
+</div>
+<%= link_to "投稿一覧に戻る", posts_path %>

@@ -1,0 +1,87 @@
+
+<h1>Linkes</h1>
+<h1>ユーザー情報</h1>
+
+<p>名前 : <%= @user.username %></p>
+<p>メールアドレス : <%= @user.email %></p>
+<p>プロフィール : <%= @user.profile %></p>
+
+    <% if current_user.id == @user.id %>
+    <%= link_to "編集する", edit_user_registration_path %>
+    <% end %>
+
+    <h2>ユーザーの投稿一覧</h2>
+    <div class="posts-container">
+        <% @posts.each do |t| %>
+            <div class="post">
+            <%=  video_tag t.video_url ,:controls => true if t.video?%>
+            <%= image_tag t.image1_url, size: "250x200" if t.image1? %>
+            <%= image_tag t.image2_url, size: "250x200" if t.image2? %>
+            <%= image_tag t.image3_url, size: "250x200" if t.image3? %>
+            <%= image_tag t.image4_url, size: "250x200" if t.image4? %>
+            <%= image_tag t.image5_url, size: "250x200" if t.image5? %>
+            <div class="youtube_url">
+            <% if t.youtube_url.present? %>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/<%= t.youtube_url.last(11) if t.youtube_url%>" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <% end %>
+            </div>
+            <p><big><%= t.title %></big></p>
+            <p><%= Rinku.auto_link(t.body, :all, 'target="_blank"').html_safe %></p>
+            <% if user_signed_in? %>
+                <% if current_user.already_liked?(t) %>
+                    <%= link_to post_like_path(id: t.id, post_id: t.id), method: :delete do %>
+                        <i class="fas fa-heart"></i><%= t.likes.count %>
+                    <% end %>
+                <% else %>
+                    <%= link_to post_likes_path(id: t.id, post_id: t.id), method: :post do %>
+                        <i class="fas fa-heart"></i><%= t.likes.count %>
+                    <% end %>
+                <% end %>
+        <% else %>
+            <i class="fas fa-heart"></i><%= t.likes.count %>
+        <% end %>
+            <%= link_to "詳細へ", post_path(t.id) %>
+            </div>
+        <% end %>
+    </div>
+
+    <!-- 以下はいいね機能を実装している場合-->
+    <h2>ユーザーがいいねした投稿一覧</h2>
+        <div class="posts-container">
+        <% @user.liked_posts.each do |t| %>
+            <div class="post">
+            <%=  video_tag t.video_url ,:controls => true if t.video?%>
+            <%= image_tag t.image1_url, size: "250x200" if t.image1? %>
+            <%= image_tag t.image2_url, size: "250x200" if t.image2? %>
+            <%= image_tag t.image3_url, size: "250x200" if t.image3? %>
+            <%= image_tag t.image4_url, size: "250x200" if t.image4? %>
+            <%= image_tag t.image5_url, size: "250x200" if t.image5? %>
+            <div class="youtube_url">
+            <% if t.youtube_url.present? %>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/<%= t.youtube_url.last(11) if t.youtube_url%>" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <% end %>
+            </div>
+            <p><big><%= t.title %></big></p>
+            <p><%= Rinku.auto_link(t.body, :all, 'target="_blank"').html_safe %></p>
+            <% if user_signed_in? %>
+                <% if current_user.already_liked?(t) %>
+                    <%= link_to post_like_path(id: t.id, post_id: t.id), method: :delete do %>
+                        <i class="fas fa-heart"></i><%= t.likes.count %>
+                    <% end %>
+                <% else %>
+                    <%= link_to post_likes_path(id: t.id, post_id: t.id), method: :post do %>
+                        <i class="fas fa-heart"></i><%= t.likes.count %>
+                    <% end %>
+                <% end %>
+        <% else %>
+            <i class="fas fa-heart"></i><%= t.likes.count %>
+        <% end %>
+            <%= link_to "詳細へ", post_path(t.id) %>
+            </div>
+        <% end %>
+    </div>
+
+<!-- ここまで-->
+
+<li><%= link_to "Post一覧に戻る", posts_path %></li>
+<li><%= link_to "新規投稿ページへ", "/posts/new" %></li>

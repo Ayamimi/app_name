@@ -1,0 +1,94 @@
+<h3>投稿詳細</h3>
+<div class="post">
+    <p><big><%= @post.title %></big></p>
+    <p><%= Rinku.auto_link(@post.body, :all, 'target="_blank"').html_safe %></p>
+    <p><%= @post.created_at %></p>
+        <% if user_signed_in? %>
+        <% if current_user.already_liked?(@post) %>
+            <%= link_to post_like_path(@post), method: :delete do %>
+                <i class="fas fa-heart"></i><%= @post.likes.count %>
+            <% end %>
+        <% else %>
+            <%= link_to post_likes_path(@post), method: :post do %>
+                <i class="far fa-heart"></i><%= @post.likes.count %>
+            <% end %>
+        <% end %>
+        <% if user_signed_in? %>
+        <% if current_user.already_bated?(@post) %>
+            <%= link_to post_bat_path(@post), method: :delete do %>
+                <i class="fas fa-thumbs-down"></i>
+            <% end %>
+        <% else %>
+            <%= link_to post_likes_path(@post), method: :post do %>
+                <i class="fas fa-thumbs-down"></i>
+            <% end %>
+        <% end %>
+        <% else %>
+            <i class="fas fa-thumbs-down"></i>
+        <% end %> 
+
+    <%=  video_tag @post.video_url ,:controls => true if @post.video?%>
+    <%= image_tag @post.image1_url, size: "250x200" if @post.image1? %>
+    <%= image_tag @post.image2_url, size: "250x200" if @post.image2? %>
+    <%= image_tag @post.image3_url, size: "250x200" if @post.image3? %>
+    <%= image_tag @post.image4_url, size: "250x200" if @post.image4? %>
+    <%= image_tag @post.image5_url, size: "250x200" if @post.image5? %>
+    <% if @post.youtube_url.present? %>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/<%= @post.youtube_url.last(11) if @post.youtube_url%>" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <% end %>
+    <% else %>
+        <i class="far fa-heart"></i><%= @post.likes.count %>
+    <% end %>
+    <%= link_to "https://twitter.com/share?url=#{request.url}", title: 'Twitter', target: '_blank' do %>
+        <i class="fab fa-twitter" style='color: #3399FF;'></i>
+    <% end %>
+</div>
+<div class="comment-wrapper">
+    <p>コメント一覧</p>
+    <% @comments.each do |c| %>
+        <% unless c.outs.count >= 3 %>
+            <%= c.content %>
+                <br>
+                <%if user_signed_in? %>
+                <% if Out.find_by(user_id: current_user.id, post_id: @post.id, comment_id: c.id) %>
+                    <%= link_to  post_comment_out_path(@post,c), {class: "like-link", method: :delete } do %>
+                    <i class="fas fa-thumbs-down"></i>
+                    <% end %>
+                <% else %>
+                    <%= link_to post_comment_outs_path(@post,c), {class: "like-link", method: :post } do %>
+                    <i class="fas fa-thumbs-down"></i>  
+                    <% end %>
+                <% end %>
+            <% else %>
+                <i class="fas fa-thumbs-down"></i>
+            <% end %>
+                <div>
+                    <%= c.user.username unless c.user.blank? %>
+                    <% if user_signed_in? && current_user.id == c.user_id %>  
+                        <%= link_to "削除する", post_comment_path(@post,c), method: :delete %>
+                        <%= link_to "編集する", edit_post_comment_path(@post,c) %>
+                    <% end %>
+                </div>
+        <% end %>        
+    <% end %>
+
+    <% if user_signed_in? %>
+        <%= form_with(model: [@post, @comment], local: true) do |f| %>
+        <%= f.text_area :content %>
+        <%= button_tag type: "submit" do %>
+            <i class="far fa-comments"></i> コメントする
+        <% end %>
+        <% end %>
+    <% end %>
+
+    <% @post.tags.each do |tag| %>
+        #<span><%= tag.name %></span>
+    <% end %>
+</div>
+
+
+<%= link_to "投稿一覧に戻る", posts_path %>
+<% if user_signed_in? && current_user.id == @post.user_id %>
+    <%= link_to "編集する", edit_post_path(@post.id) %>
+<% end %>
+
